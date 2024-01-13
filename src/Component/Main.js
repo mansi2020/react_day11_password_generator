@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./../App.css";
 
 const Main = () => {
@@ -38,7 +38,8 @@ const Main = () => {
   //<----------------------use state---------------------------->
   const [selectedValues, setSelectedValues] = useState([]);
   const [userInputLength, setUserInputLength] = useState(8);
-  const [generatedPassword, setGeneratedPassword] = useState("");
+  // const [generatedPassword, setGeneratedPassword] = useState("");
+  const useRefPassword = useRef("");
 
   // <-------------------Handle checked value from checkbox------------------------------------>
   let handleChange = (e) => {
@@ -97,7 +98,7 @@ const Main = () => {
         let randomIndex = Math.floor(Math.random() * selectedValues.length);
         newGeneratePassword += selectedValues[randomIndex];
       }
-      setGeneratedPassword(newGeneratePassword);
+      useRefPassword.current.value = newGeneratePassword;
     } else {
       alert("Password length is out of range");
     }
@@ -107,14 +108,14 @@ const Main = () => {
   const [textToCopy, setTextToCopy] = useState("hello");
 
   useEffect(() => {
-    setTextToCopy(generatedPassword);
-  }, [generatedPassword]);
+    setTextToCopy(useRefPassword.current.value);
+  }, [useRefPassword.current.value]);
 
   let copyToClipboard = () => {
     navigator.clipboard
-      .writeText(textToCopy)
+      .writeText(useRefPassword.current.value)
       .then(() => {
-        alert(`Password copied : ${generatedPassword}`);
+        alert(`Password copied : ${useRefPassword.current.value}`);
       })
       .catch((error) => {
         console.error("Error copying text:", error);
@@ -133,12 +134,10 @@ const Main = () => {
       <div className="password-container">
         <textarea
           className="password-input"
-          onChange={(e) => setTextToCopy(e.target.value)}
-          value={generatedPassword}
+          ref={useRefPassword}
+          value={useRefPassword.current.value}
           readOnly
-        >
-          {generatedPassword}
-        </textarea>
+        ></textarea>
         <button onClick={copyToClipboard} className="copy-button">
           <i className="material-icons">content_copy</i>
         </button>
